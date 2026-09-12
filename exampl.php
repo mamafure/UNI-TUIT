@@ -48,7 +48,7 @@ $seller_id = $seller_data['id'];
 <body>
 
     <div class="nav">PANELI YA MUUZAJI (SELLER)</div>
-
+<!-- testing testing testing  -->
     <div class="container">
         <!-- FORM TO ADD NEW PRODUCT -->
         <div class="card">
