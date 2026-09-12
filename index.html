@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNI-TUIT | Excellence in Learning</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --accent-color: #f59e0b;
+            --text-dark: #1f2937;
+            --light-bg: #f3f4f6;
+            --white: #ffffff;
+            --error-color: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { line-height: 1.6; color: var(--text-dark); background: var(--light-bg); }
+
+        /* --- Navigation --- */
+        header {
+            background: var(--white);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0; z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .logo { font-size: 1.8rem; font-weight: 800; color: var(--primary-color); }
+        .menu-btn {
+            background: var(--primary-color); color: white; border: none;
+            padding: 10px 20px; border-radius: 5px; cursor: pointer;
+        }
+
+        .nav-menu {
+            position: fixed; top: -100%; left: 0; width: 100%;
+            background: rgba(30, 58, 138, 0.98); padding: 2rem 0;
+            transition: 0.5s; text-align: center; z-index: 999;
+        }
+        .nav-menu.active { top: 70px; }
+        .nav-menu ul { list-style: none; }
+        .nav-menu ul li { margin: 20px 0; }
+        .nav-menu ul li a { color: white; text-decoration: none; font-size: 1.2rem; }
+
+        /* --- Sections Visibility --- */
+        .page-section { display: none; padding-top: 80px; }
+        .page-section.active { display: block; }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 70vh;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                        url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover; background-position: center;
+            display: flex; align-items: center; justify-content: center; color: white; text-align: center;
+        }
+
+        /* --- Module Grid --- */
+        .modules { padding: 50px 10%; }
+        .module-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px;
+        }
+        .module-card {
+            background: white; border-radius: 10px; overflow: hidden; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s;
+        }
+        .module-card:hover { transform: translateY(-5px); }
+        .module-card img { width: 100%; height: 180px; object-fit: cover; }
+        .module-info { padding: 15px; text-align: center; }
+
+        /* --- Login Section --- */
+        .login-container {
+            max-width: 400px; margin: 50px auto; background: white;
+            padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .login-container h2 { color: var(--primary-color); margin-bottom: 20px; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+        .form-group input {
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;
+        }
+        .btn-submit {
+            width: 100%; padding: 12px; background: var(--primary-color);
+            color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;
+        }
+        .register-link {
+            text-align: center; margin-top: 15px; font-size: 0.9rem;
+        }
+        .register-link span { color: var(--accent-color); cursor: pointer; font-weight: 700; text-decoration: underline; }
+
+        /* --- Registration Modal (Pop-up) --- */
+        .modal {
+            display: none; position: fixed; z-index: 2000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: white; padding: 30px; border-radius: 15px;
+            width: 90%; max-width: 500px; position: relative;
+            animation: slideDown 0.4s ease;
+        }
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .close-modal { position: absolute; right: 20px; top: 15px; font-size: 1.5rem; cursor: pointer; }
+
+        /* --- Footer --- */
+        footer { background: #111; color: white; padding: 40px 10% 20px; margin-top: 50px; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; }
+        .social-links a { color: white; margin-right: 15px; font-size: 1.2rem; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">UNI-TUIT</div>
+        <button class="menu-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i> MENU</button>
+    </header>
+
+    <nav class="nav-menu" id="navMenu">
+        <ul>
+            <li><a href="#" onclick="showSection('home')">Home</a></li>
+            <li><a href="#" onclick="showSection('home')">About Us</a></li>
+            <li><a href="#" onclick="showSection('login')">Login / Register</a></li>
+            <li><a href="#contact">Contact Us</a></li>
+        </ul>
+    </nav>
+
+    <!-- HOME PAGE -->
+    <div id="home" class="page-section active">
+        <section class="hero">
+            <div>
+                <h1>Quality Education for Everyone</h1>
+                <p>Register now to access world-class university modules.</p>
+            </div>
+        </section>
+
+        <section class="about" style="padding: 50px 10%; text-align: center;">
+            <h2 style="color: var(--primary-color);">About UNI-TUIT</h2>
+            <p>We guarantee a <b>Better and Quality service</b> of teaching. Our platform is designed to ensure students grasp difficult concepts easily with professional assistance.</p>
+        </section>
+
+        <section class="modules">
+            <h2 style="text-align: center; margin-bottom: 30px;">Our Modules</h2>
+            <div class="module-grid">
+                <div class="module-card" onclick="restrictedAccess('Database Systems')">
+                    <img src="https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=400" alt="DB">
+                    <div class="module-info"><h3>Database System</h3><p>Click for info</p></div>
+                </div>
+                <div class="module-card" onclick="restrictedAccess('Operating Systems')">
+                    <img src="https://images.unsplash.com/photo-1518481612222-68bbe828ecd1?w=400" alt="OS">
+                    <div class="module-info"><h3>OS</h3><p>Click for info</p></div>
+                </div>
+                <div class="module-card" onclick="restrictedAccess('Networking')">
+                    <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400" alt="Net">
+                    <div class="module-info"><h3>Networking</h3><p>Click for info</p></div>
+                </div>
+                <div class="module-card" onclick="restrictedAccess('Web Programming')">
+                    <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400" alt="Web">
+                    <div class="module-info"><h3>Web Programming</h3><p>Click for info</p></div>
+                </div>
+                <div class="module-card" onclick="restrictedAccess('Calculus')">
+                    <img src="https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400" alt="Math">
+                    <div class="module-info"><h3>Function of Single Variable</h3><p>Click for info</p></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- LOGIN PAGE -->
+    <div id="login" class="page-section">
+        <div class="login-container">
+            <h2>Login to UNI-TUIT</h2>
+            <form onsubmit="event.preventDefault(); alert('Login Successful!');">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="btn-submit">Login</button>
+            </form>
+            <div class="register-link">
+                New to UNI-TUIT? <span onclick="openModal()">Register Now</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- REGISTRATION MODAL (Pop-up) -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 style="color: var(--primary-color); text-align: center;">Join UNI-TUIT</h2>
+            <p style="text-align: center; font-size: 0.8rem; margin-bottom: 20px;">Fill in your details to get started</p>
+            
+            <form id="regForm" onsubmit="return validateRegister(event)">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="regUser" placeholder="Full Name" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" id="regPhone" placeholder="e.g. 0712345678" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmail" placeholder="Email Address" required>
+                </div>
+                <div class="form-group">
+                    <label>Program Name</label>
+                    <input type="text" id="regProg" placeholder="e.g. Bachelor of IT" required>
+                </div>
+                <button type="submit" class="btn-submit">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <footer id="contact">
+        <div class="footer-grid">
+            <div><h3>UNI-TUIT</h3><p>Guaranteed Quality Education</p></div>
+            <div>
+                <h3>Contact</h3>
+                <p>Email: support@uni-tuit.com</p>
+                <p>WhatsApp: +255 700 000 000</p>
+            </div>
+            <div>
+                <h3>Socials</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Toggle Nav Menu
+        function toggleMenu() {
+            document.getElementById('navMenu').classList.toggle('active');
+        }
+
+        // Switch between Home and Login pages
+        function showSection(sectionId) {
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            document.getElementById('navMenu').classList.remove('active');
+            window.scrollTo(0,0);
+        }
+
+        // Module Click logic
+        function restrictedAccess(moduleName) {
+            alert("To access details for '" + moduleName + "', you should register first to continue.");
+            showSection('login');
+        }
+
+        // Modal Controls
+        function openModal() { document.getElementById('registerModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('registerModal').style.display = 'none'; }
+
+        // Registration Validation
+        function validateRegister(e) {
+            e.preventDefault();
+            const phone = document.getElementById('regPhone').value;
+            const phoneRegex = /^(06|07)\d{8}$/;
+
+            if (!phoneRegex.test(phone)) {
+                alert("Invalid Phone Number! Must start with 06 or 07 and be exactly 10 digits.");
+                return false;
+            }
+
+            alert("Registration Successful! You can now log in.");
+            closeModal();
+            return true;
+        }
+
+        // Close modal if user clicks outside of it
+        window.onclick = function(event) {
+            let modal = document.getElementById('registerModal');
+            if (event.target == modal) { closeModal(); }
+        }
+    </script>
+</body>
+</html>
