@@ -1,83 +1,67 @@
-<?php 
-include 'db.php'; 
+<?php
+include 'db.php';
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: admin_login.php");
     exit();
 }
 
-$subject_name = $_GET['name'];
+include 'admin_ui.php';
 
-// Query to get details of all students registered for THIS subject
-$query = "SELECT users.username, users.email, users.phone, users.program 
-          FROM registrations 
-          JOIN users ON registrations.user_id = users.id 
-          WHERE registrations.module_name = '$subject_name' AND registrations.status = 'Registered'
-          ORDER BY users.username ASC";
+$subject_name = (string)($_GET['name'] ?? '');
 
-$result = mysqli_query($conn, $query);
+// Confirmed students for THIS subject (prepared statement: name comes from the URL)
+$stmt = mysqli_prepare($conn, "SELECT users.username, users.email, users.phone, users.program
+          FROM registrations
+          JOIN users ON registrations.user_id = users.id
+          WHERE registrations.module_name = ? AND registrations.status = 'Registered'
+          ORDER BY users.username ASC");
+mysqli_stmt_bind_param($stmt, 's', $subject_name);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$rows = [];
+while ($row = mysqli_fetch_assoc($result)) { $rows[] = $row; }
+mysqli_stmt_close($stmt);
+
+admin_page_start('Class List: ' . $subject_name, 'subjects', [
+    'eyebrow' => 'Official class list',
+    'heading' => $subject_name,
+    'sub' => 'Confirmed students registered for this module.',
+    'stats' => false,
+    'back' => ['admin_subjects.php', 'Back to Subjects'],
+]);
 ?>
+    <div class="panel">
+        <div class="panel-head">
+            <div>
+                <span class="eyebrow">Enrolment</span>
+                <h2><?php echo count($rows); ?> confirmed <?php echo count($rows) === 1 ? 'student' : 'students'; ?></h2>
+            </div>
+        </div>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Class List: <?php echo $subject_name; ?></title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body { font-family: 'Poppins', sans-serif; background: #f1f5f9; padding: 40px; margin: 0; }
-        .container { max-width: 900px; margin: auto; }
-        .header { background: #1e3a8a; color: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; position: relative; }
-        .back-btn { color: white; text-decoration: none; font-size: 14px; position: absolute; top: 10px; left: 20px; opacity: 0.8; }
-        
-        .card { background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8fafc; padding: 15px; text-align: left; color: #64748b; font-size: 13px; text-transform: uppercase; }
-        td { padding: 15px; border-top: 1px solid #f1f5f9; font-size: 14px; }
-        tr:hover { background: #fdfdfd; }
-        
-        .empty-state { padding: 40px; text-align: center; color: #94a3b8; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="header">
-        <a href="admin_subjects.php" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Subjects</a>
-        <h1 style="margin: 10px 0 0 0;"><?php echo $subject_name; ?></h1>
-        <p style="margin: 5px 0 0 0; opacity: 0.9;">Official Class List (Confirmed Students)</p>
-    </div>
-
-    <div class="card">
-        <?php if(mysqli_num_rows($result) > 0): ?>
+        <?php if ($rows): ?>
+        <div class="table-wrap">
             <table>
                 <thead>
-                    <tr>
-                        <th>Student Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Program</th>
-                    </tr>
+                    <tr><th>Student</th><th>Email</th><th>Phone</th><th>Program</th></tr>
                 </thead>
                 <tbody>
-                    <?php while($row = mysqli_fetch_assoc($result)): ?>
-                        <tr>
-                            <td><strong><?php echo $row['username']; ?></strong></td>
-                            <td><?php echo $row['email']; ?></td>
-                            <td><?php echo $row['phone']; ?></td>
-                            <td><?php echo $row['program']; ?></td>
-                        </tr>
-                    <?php endwhile; ?>
+                <?php foreach ($rows as $row): ?>
+                    <tr>
+                        <td><div class="person"><span class="avatar"><?php echo admin_h(strtoupper(mb_substr($row['username'], 0, 1))); ?></span><strong><?php echo admin_h($row['username']); ?></strong></div></td>
+                        <td><?php echo admin_h($row['email']); ?></td>
+                        <td class="mono"><?php echo admin_h($row['phone']); ?></td>
+                        <td><?php echo admin_h($row['program']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
                 </tbody>
             </table>
+        </div>
         <?php else: ?>
             <div class="empty-state">
-                <i class="fas fa-users-slash" style="font-size: 50px; margin-bottom: 15px;"></i>
+                <i class="fas fa-users-slash"></i>
                 <p>No students have been officially registered for this module yet.</p>
             </div>
         <?php endif; ?>
     </div>
-</div>
-
-</body>
-</html>
+<?php admin_page_end();

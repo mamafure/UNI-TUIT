@@ -1,5 +1,5 @@
-<?php 
-include 'db.php'; 
+<?php
+include 'db.php';
 
 // ACCESS CONTROL: Admin only
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
@@ -7,103 +7,86 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-$pending_count_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM registrations WHERE status = 'Pending'"));
-$pending_count = $pending_count_row['n'];
+include 'admin_ui.php';
+
+// Unique students who have at least one registration
+$sql = "SELECT users.id, users.username, users.email, users.phone, users.program,
+        COUNT(registrations.id) AS total_mods,
+        SUM(registrations.status = 'Pending') AS pending_mods
+        FROM users
+        JOIN registrations ON users.id = registrations.user_id
+        GROUP BY users.id
+        ORDER BY users.username ASC";
+$result = mysqli_query($conn, $sql);
+$students = [];
+while ($row = mysqli_fetch_assoc($result)) { $students[] = $row; }
+
+admin_page_start('Student Registrations', 'students', [
+    'heading' => 'Student Registrations',
+    'sub' => 'Every student who has applied for modules, with their current activity.',
+]);
 ?>
+    <div class="panel">
+        <div class="panel-head">
+            <div>
+                <span class="eyebrow">Directory</span>
+                <h2>All Students</h2>
+            </div>
+            <?php if ($students): ?>
+            <label class="search"><i class="fas fa-magnifying-glass"></i>
+                <input type="search" id="studentSearch" placeholder="Search name, email or program" aria-label="Search students">
+            </label>
+            <?php endif; ?>
+        </div>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard | Student List</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { --primary: #1e3a8a; --bg: #f1f5f9; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; display: flex; }
-        
-        /* Sidebar */
-        .sidebar { width: 250px; background: var(--primary); height: 100vh; color: white; padding: 20px; position: fixed; }
-        .sidebar h2 { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-        .sidebar a { color: white; text-decoration: none; display: flex; justify-content: space-between; align-items: center; padding: 12px; margin: 5px 0; border-radius: 8px; }
-        .sidebar a:hover { background: rgba(255,255,255,0.1); }
-        .nav-badge { background: #f59e0b; color: white; font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 10px; }
-
-        /* Main Content */
-        .main { margin-left: 250px; width: 100%; padding: 40px; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { text-align: left; padding: 15px; background: #f8fafc; color: #64748b; text-transform: uppercase; font-size: 13px; }
-        td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
-
-        tr.student-row { cursor: pointer; transition: background 0.15s; }
-        tr.student-row:hover { background: #f8fafc; }
-
-        .btn-view { background: var(--primary); color: white; padding: 8px 15px; border-radius: 6px; text-decoration: none; font-size: 13px; }
-        .subject-count { background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 12px; }
-    </style>
-</head>
-<body>
-
-<div class="sidebar">
-    <h2>UNI-TUIT Admin</h2>
-    <a href="admin.php" style="background:rgba(255,255,255,0.1)"><i class="fas fa-users"></i> Student List</a>
-    <a href="admin_pending.php">
-        <span><i class="fas fa-hourglass-half"></i> Pending Approvals</span>
-        <?php if ($pending_count > 0): ?><span class="nav-badge"><?php echo $pending_count; ?></span><?php endif; ?>
-    </a>
-    <a href="admin_subjects.php"><i class="fas fa-book"></i> Subject Reports</a> <!-- NEW TAB -->
-    <a href="services.php"><i class="fas fa-tools"></i> Services</a>
-    <a href="logout.php" style="margin-top: 50px;"><i class="fas fa-sign-out-alt"></i> Logout</a>
-</div>
-
-<div class="main">
-    <h1>Student Registrations</h1>
-    <p>Below is the list of unique students who have applied for modules.</p>
-
-    <div class="card">
-        <table>
-            <thead>
-                <tr>
-                    <th>Student Name</th>
-                    <th>Email & Contact</th>
-                    <th>Program</th>
-                    <th>Subjects Chosen</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                // Fetch unique users who have at least one registration
-                $sql = "SELECT users.id, users.username, users.email, users.phone, users.program, 
-                        COUNT(registrations.id) as total_mods 
-                        FROM users 
-                        JOIN registrations ON users.id = registrations.user_id 
-                        GROUP BY users.id 
-                        ORDER BY users.username ASC";
-                
-                $result = mysqli_query($conn, $sql);
-                while($row = mysqli_fetch_assoc($result)) {
-                    $uid = (int) $row['id'];
-                    $username = htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8');
-                    $email = htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8');
-                    $phone = htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8');
-                    $program = htmlspecialchars($row['program'], ENT_QUOTES, 'UTF-8');
-                    echo "<tr class='student-row' onclick=\"location.href='admin_student_details.php?user_id={$uid}'\">";
-                    echo "<td><strong>{$username}</strong></td>";
-                    echo "<td>{$email}<br><small>{$phone}</small></td>";
-                    echo "<td>{$program}</td>";
-                    echo "<td><span class='subject-count'>{$row['total_mods']} Modules</span></td>";
-                    echo "<td><a href='admin_student_details.php?user_id={$uid}' class='btn-view'>View Submissions</a></td>";
-                    echo "</tr>";
-                }
-                
-
+        <?php if (!$students): ?>
+            <div class="empty-state">
+                <i class="fas fa-user-graduate"></i>
+                <p>No students have selected modules yet.</p>
+            </div>
+        <?php else: ?>
+        <div class="table-wrap">
+            <table id="studentTable">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Contact</th>
+                        <th>Program</th>
+                        <th>Modules</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($students as $s):
+                    $uid = (int)$s['id'];
+                    $initial = strtoupper(mb_substr($s['username'], 0, 1));
+                    $pend = (int)$s['pending_mods'];
+                    $mods = (int)$s['total_mods'];
                 ?>
-            </tbody>
-        </table>
+                    <tr class="clickable" onclick="location.href='admin_student_details.php?user_id=<?php echo $uid; ?>'">
+                        <td><div class="person"><span class="avatar"><?php echo admin_h($initial); ?></span><strong><?php echo admin_h($s['username']); ?></strong></div></td>
+                        <td><?php echo admin_h($s['email']); ?><br><small><?php echo admin_h($s['phone']); ?></small></td>
+                        <td><?php echo admin_h($s['program']); ?></td>
+                        <td><div class="pill-group">
+                            <span class="count-pill"><?php echo $mods; ?> <?php echo $mods === 1 ? 'module' : 'modules'; ?></span>
+                            <?php if ($pend > 0): ?><span class="badge badge-pending"><?php echo $pend; ?> pending</span><?php endif; ?>
+                        </div></td>
+                        <td><a href="admin_student_details.php?user_id=<?php echo $uid; ?>" class="btn btn-outline">View <i class="fas fa-arrow-right"></i></a></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php endif; ?>
     </div>
-</div>
 
-</body>
-</html>
+<script>
+    var box = document.getElementById('studentSearch');
+    if (box) box.addEventListener('input', function () {
+        var q = this.value.toLowerCase();
+        document.querySelectorAll('#studentTable tbody tr').forEach(function (tr) {
+            tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';
+        });
+    });
+</script>
+<?php admin_page_end();
