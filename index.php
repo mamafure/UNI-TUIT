@@ -300,6 +300,7 @@
         <a href="services.php">Other Services</a>
         <a href="#contact">Contact</a>
         <div class="nav-actions">
+            <a href="admin_login.php" class="btn btn-ghost"><i class="fas fa-user-shield"></i> Admin</a>
             <button class="btn btn-ghost" onclick="openModal('login')">Log in</button>
             <button class="btn btn-gold" onclick="openModal('register')">Get Started</button>
         </div>
@@ -319,6 +320,7 @@
         <a href="services.php">Other Services</a>
         <a href="#contact" onclick="toggleMenu()">Contact</a>
         <div class="mobile-nav-actions">
+            <a href="admin_login.php" class="btn btn-ghost btn-block"><i class="fas fa-user-shield"></i> Admin Login</a>
             <button class="btn btn-ghost btn-block" onclick="toggleMenu(); openModal('login')">Log in</button>
             <button class="btn btn-gold btn-block" onclick="toggleMenu(); openModal('register')">Get Started</button>
         </div>
@@ -398,7 +400,7 @@
 <footer id="contact">
     <div class="foot-brand">UNI-TUIT</div>
     <p>Email: fransiscofrednand24@gmail.com &nbsp;|&nbsp; WhatsApp: +255 760 987 261</p>
-    <p>&copy; 2026 UNI-TUIT System</p>
+    <p>&copy; 2026 UNI-TUIT System &nbsp;|&nbsp; <a href="admin_login.php" style="color:inherit;">Admin Login</a></p>
 </footer>
 
 <!-- AUTH MODAL -->

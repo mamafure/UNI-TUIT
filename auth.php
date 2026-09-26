@@ -38,6 +38,14 @@ if (isset($_POST['login'])) {
     $row = mysqli_fetch_assoc($res);
 
     if ($row && password_verify($pass, $row['password'])) {
+        // Admins who use the student form go straight to the admin dashboard
+        if (($row['role'] ?? '') === 'admin') {
+            $_SESSION['admin_id'] = $row['id'];
+            $_SESSION['username'] = $row['username'];
+            $_SESSION['role'] = 'admin';
+            header("Location: admin.php");
+            exit();
+        }
         $_SESSION['user_id'] = $row['id'];
         $_SESSION['username'] = $row['username'];
         flash_set('success', 'Welcome back, ' . $row['username'] . '!');
