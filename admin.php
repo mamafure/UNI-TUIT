@@ -99,14 +99,16 @@ admin_page_start('Student Registrations', 'students', [
     .drawer-backdrop.open { opacity: 1; visibility: visible; }
     .drawer { position: fixed; top: 0; right: 0; bottom: 0; z-index: 1501; width: 440px; max-width: 100%; background: var(--paper); box-shadow: -30px 0 60px -20px rgba(10,20,45,.45); transform: translateX(105%); transition: transform .3s cubic-bezier(.22,.8,.3,1); display: flex; flex-direction: column; }
     .drawer.open { transform: none; }
-    .drawer-head { background: linear-gradient(135deg, var(--ink), var(--ink-2)); color: #fff; padding: 26px 28px 24px; position: relative; }
+    .drawer-head { background: linear-gradient(135deg, var(--ink), var(--ink-2)); color: #fff; padding: 14px 64px 14px 22px; position: relative; display: flex; align-items: center; gap: 12px; min-height: 68px; }
     .drawer-head .eyebrow { color: var(--gold-light); }
-    .drawer-head .avatar { width: 56px; height: 56px; font-size: 19px; background: var(--paper-2); margin: 14px 0 12px; }
-    .drawer-head h2 { color: #fff; font-size: 1.45rem; }
-    .drawer-close { position: absolute; top: 18px; right: 18px; width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); color: #fff; cursor: pointer; font-size: 16px; }
+    .drawer-head .avatar { width: 38px; height: 38px; font-size: 14px; background: var(--paper-2); color: var(--ink); }
+    .drawer-head .who { min-width: 0; }
+    .drawer-head h2 { color: #fff; font-size: 1.1rem; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .drawer-head .eyebrow { font-size: 10px; display: block; margin-bottom: 2px; }
+    .drawer-close { position: absolute; top: 50%; transform: translateY(-50%); right: 16px; width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); color: #fff; cursor: pointer; font-size: 16px; }
     .drawer-close:hover { background: rgba(255,255,255,.18); border-color: #fff; }
-    .drawer-body { padding: 22px 28px 28px; overflow-y: auto; flex: 1; }
-    .info-list { display: grid; gap: 14px; margin: 0 0 26px; padding: 0; list-style: none; }
+    .drawer-body { padding: 20px 22px 24px; overflow-y: auto; flex: 1; }
+    .info-list { display: grid; gap: 12px; margin: 0 0 22px; padding: 0; list-style: none; }
     .info-list li { display: flex; gap: 14px; align-items: flex-start; font-size: 14.5px; word-break: break-word; }
     .info-list i { width: 32px; height: 32px; border-radius: 10px; background: var(--paper-2); color: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
     .info-list small { display: block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 2px; }
@@ -128,10 +130,9 @@ admin_page_start('Student Registrations', 'students', [
 <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeStudent()"></div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerName" aria-hidden="true">
     <div class="drawer-head">
-        <span class="eyebrow">Student profile</span>
-        <button type="button" class="drawer-close" id="drawerClose" onclick="closeStudent()" aria-label="Close"><i class="fas fa-xmark"></i></button>
         <div class="avatar" id="drawerAvatar"></div>
-        <h2 id="drawerName"></h2>
+        <div class="who"><span class="eyebrow">Student profile</span><h2 id="drawerName"></h2></div>
+        <button type="button" class="drawer-close" id="drawerClose" onclick="closeStudent()" aria-label="Close"><i class="fas fa-xmark"></i></button>
     </div>
     <div class="drawer-body">
         <ul class="info-list" id="drawerInfo"></ul>
