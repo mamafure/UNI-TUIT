@@ -15,8 +15,8 @@ if ($role_row && $role_row['role'] === 'admin') {
 }
 
 // 1. Define all available subjects in your system
-$all_system_modules = ["Database System", "OS", "Networking", "Web Programming", "Calculus"];
-$max_modules = count($all_system_modules);
+include 'modules_lib.php';
+$open_module_names = array_column(modules_fetch($conn, true), 'name');
 
 // 2. Fetch the user's current selections
 $query = "SELECT * FROM registrations WHERE user_id = '$u_id'";
@@ -46,6 +46,8 @@ while($row = mysqli_fetch_assoc($result)) {
 // Modules still "in play" (not rejected) — used to know when everything active is Registered
 $active_total = $user_total_count - $rejected_count;
 
+$taken_names = array_column($selected_subjects, 'module_name');
+$modules_left = count(array_diff($open_module_names, $taken_names));
 $btn_main_text = ($user_total_count > 0) ? "+ Add Another Subject" : "Select Your Subjects";
 $display_name = htmlspecialchars($_SESSION['username'], ENT_QUOTES, 'UTF-8');
 $js_name = json_encode($_SESSION['username']);
@@ -284,7 +286,7 @@ $js_name = json_encode($_SESSION['username']);
         ?>
 
         <!-- SMART BUTTON LOGIC: Hide button if user has all subjects -->
-        <?php if ($user_total_count < 2): ?>
+        <?php if ($modules_left > 0): ?>
             <a href="subject_list" class="browse-link">
                 <i class="fas fa-plus"></i> <?php echo $btn_main_text; ?>
             </a>

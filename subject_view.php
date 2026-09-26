@@ -8,65 +8,39 @@ if(!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$m_name = $_GET['name'];
-$u_id = $_SESSION['user_id'];
+include 'modules_lib.php';
+$m_name = (string)($_GET['name'] ?? '');
+$u_id = (int)$_SESSION['user_id'];
 
-// 1. DATA ARRAY: Information for each specific subject
-$subject_data = [
-    "Database System" => [
-        "intro" => "Master the art of data management. In today's world, data is the new oil, and knowing how to store, retrieve, and secure it is a vital skill for any IT professional.",
-        "topics" => ["Entity Relationship Diagrams (ERD)", "Advanced SQL Queries", "Database Normalization (1NF, 2NF, 3NF)", "Transaction Management & Concurrency Control"],
-        "icon" => "fa-database",
-        "color" => "#2563eb",
-       "watermark" => "db.jpg" // Database icon
-
-    ],
-    "OS" => [
-        "intro" => "Go behind the scenes of computing. Learn how Operating Systems manage hardware resources and provide a platform for application software to run smoothly.",
-        "topics" => ["Process Scheduling & Threads", "Memory Management & Virtual Memory", "Deadlock Detection and Prevention", "File Systems and Disk Management"],
-        "icon" => "fa-microchip",
-        "color" => "#dc2626",
-        "watermark" => "os.jpg"
-    ],
-    "Networking" => [
-        "intro" => "The world is connected! Understand the protocols and technologies that allow computers to communicate across the globe, from local cables to the vast internet.",
-        "topics" => ["OSI and TCP/IP Models", "IP Addressing and Subnetting", "Routing and Switching Protocols", "Network Security and Firewalls"],
-        "icon" => "fa-network-wired",
-        "color" => "#059669",
-        "watermark" => "network.jpg"
-    ],
-    "Web Programming" => [
-        "intro" => "Build the modern web. From beautiful user interfaces to powerful server-side logic, this module prepares you to create full-stack web applications.",
-        "topics" => ["Responsive Design with HTML5 & CSS3", "JavaScript & DOM Manipulation", "PHP Backend & MySQL Integration", "Web Security Best Practices"],
-        "icon" => "fa-code",
-        "color" => "#7c3aed",
-        "watermark" => "web.jpg"
-    ],
-    "Function of Single Varriable" => [
-        "intro" => "The mathematics of change. Calculus is essential for engineering, physics, and computer science. We make complex derivatives and integrals easy to understand.",
-        "topics" => ["Limits and Continuity", "Rules of Differentiation", "Applications of Integrals", "Infinite Sequences and Series"],
-        "icon" => "fa-square-root-variable",
-        "color" => "#ea580c",
-        "watermark" => "function.jpg"
-    ]
-];
-
-// Fallback if the subject name doesn't exist in our array
-if (!array_key_exists($m_name, $subject_data)) {
-    die("Subject not found.");
+// Module details come from the catalogue the admin manages (only visible modules)
+$module = module_find($conn, $m_name, true);
+if (!$module) {
+    flash_set('error', 'That module is not available.');
+    header("Location: subject_list");
+    exit();
 }
-
-$info = $subject_data[$m_name];
+$info = [
+    'intro' => $module['description'],
+    'topics' => module_topics($module),
+    'icon' => $module['icon'],
+    'color' => $module['color'],
+    'watermark' => $module['image'],
+];
 
 // 2. HANDLE SUBMISSION
 if (isset($_POST['add'])) {
     // Check if user already registered for this specific module
-    $check = mysqli_query($conn, "SELECT * FROM registrations WHERE user_id='$u_id' AND module_name='$m_name'");
-    if (mysqli_num_rows($check) > 0) {
+    $chk = mysqli_prepare($conn, "SELECT id FROM registrations WHERE user_id = ? AND module_name = ?");
+    mysqli_stmt_bind_param($chk, 'is', $u_id, $module['name']);
+    mysqli_stmt_execute($chk);
+    if (mysqli_fetch_assoc(mysqli_stmt_get_result($chk))) {
         flash_set('error', 'You have already added this subject to your list.');
     } else {
-        mysqli_query($conn, "INSERT INTO registrations (user_id, module_name,fee,status) VALUES ('$u_id', '$m_name',5000,'Draft')");
-        flash_set('success', $m_name . ' has been added to your tuition list.');
+        $fee = (int)$module['fee'];
+        $ins = mysqli_prepare($conn, "INSERT INTO registrations (user_id, module_name, fee, status) VALUES (?, ?, ?, 'Draft')");
+        mysqli_stmt_bind_param($ins, 'isi', $u_id, $module['name'], $fee);
+        mysqli_stmt_execute($ins);
+        flash_set('success', $module['name'] . ' has been added to your tuition list.');
     }
     header("Location: home");
     exit();
@@ -122,7 +96,7 @@ if (isset($_POST['add'])) {
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             width: 500px; height: 500px;
-            background-image: url('<?php echo htmlspecialchars($info['watermark'], ENT_QUOTES, 'UTF-8'); ?>');
+            <?php if ($info['watermark'] !== ''): ?>background-image: url('<?php echo htmlspecialchars($info['watermark'], ENT_QUOTES, 'UTF-8'); ?>');<?php endif; ?>
             background-repeat: no-repeat;
             background-position: center;
             background-size: contain;
@@ -199,7 +173,14 @@ if (isset($_POST['add'])) {
         <div class="subject-badge"><i class="fas <?php echo $info['icon']; ?>"></i></div>
         <div>
             <span class="eyebrow">Module Profile</span>
-            <h1><?php echo htmlspecialchars($m_name, ENT_QUOTES, 'UTF-8'); ?></h1>
+            <h1><?php echo htmlspecialchars($module['name'], ENT_QUOTES, 'UTF-8'); ?></h1>
+            <?php if ($module['instructor'] !== '' || $module['duration'] !== ''): ?>
+                <p style="color:rgba(255,255,255,.75); margin:8px 0 0; font-size:14.5px;">
+                    <?php if ($module['instructor'] !== ''): ?><i class="fas fa-chalkboard-user" style="color:var(--gold-light)"></i> <?php echo htmlspecialchars($module['instructor'], ENT_QUOTES, 'UTF-8'); ?><?php endif; ?>
+                    <?php if ($module['instructor'] !== '' && $module['duration'] !== ''): ?>&nbsp;&middot;&nbsp;<?php endif; ?>
+                    <?php if ($module['duration'] !== ''): ?><i class="fas fa-clock" style="color:var(--gold-light)"></i> <?php echo htmlspecialchars($module['duration'], ENT_QUOTES, 'UTF-8'); ?><?php endif; ?>
+                </p>
+            <?php endif; ?>
         </div>
     </div>
 </section>
@@ -222,7 +203,7 @@ if (isset($_POST['add'])) {
     <div class="sidebar-card">
         <span class="eyebrow">Tuition Registration Fee</span>
         <div class="fee-section">
-            <div class="fee-amount">5,000 Tsh</div>
+            <div class="fee-amount"><?php echo number_format((int)$module['fee']); ?> Tsh</div>
             <p class="fee-note">Payable via M-Pesa / TigoPesa after confirmation</p>
         </div>
 

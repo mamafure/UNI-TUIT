@@ -95,19 +95,11 @@ admin_page_start('Student Registrations', 'students', [
     </div>
 
 <style>
-    .drawer-backdrop { position: fixed; inset: 0; z-index: 1500; background: rgba(16,37,78,.35); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); opacity: 0; visibility: hidden; transition: opacity .25s ease, visibility .25s; }
-    .drawer-backdrop.open { opacity: 1; visibility: visible; }
-    .drawer { position: fixed; top: 0; right: 0; bottom: 0; z-index: 1501; width: 440px; max-width: 100%; background: var(--paper); box-shadow: -30px 0 60px -20px rgba(10,20,45,.45); transform: translateX(105%); transition: transform .3s cubic-bezier(.22,.8,.3,1); display: flex; flex-direction: column; }
-    .drawer.open { transform: none; }
-    .drawer-head { background: linear-gradient(135deg, var(--ink), var(--ink-2)); color: #fff; padding: 14px 64px 14px 22px; position: relative; display: flex; align-items: center; gap: 12px; min-height: 68px; }
     .drawer-head .eyebrow { color: var(--gold-light); }
     .drawer-head .avatar { width: 38px; height: 38px; font-size: 14px; background: var(--paper-2); color: var(--ink); }
     .drawer-head .who { min-width: 0; }
     .drawer-head h2 { color: #fff; font-size: 1.1rem; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .drawer-head .eyebrow { font-size: 10px; display: block; margin-bottom: 2px; }
-    .drawer-close { position: absolute; top: 50%; transform: translateY(-50%); right: 16px; width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); color: #fff; cursor: pointer; font-size: 16px; }
-    .drawer-close:hover { background: rgba(255,255,255,.18); border-color: #fff; }
-    .drawer-body { padding: 20px 22px 24px; overflow-y: auto; flex: 1; }
     .info-list { display: grid; gap: 12px; margin: 0 0 22px; padding: 0; list-style: none; }
     .info-list li { display: flex; gap: 14px; align-items: flex-start; font-size: 14.5px; word-break: break-word; }
     .info-list i { width: 32px; height: 32px; border-radius: 10px; background: var(--paper-2); color: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
@@ -121,10 +113,6 @@ admin_page_start('Student Registrations', 'students', [
     .mod-fee { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--ink-soft); margin-top: 3px; }
     .mod .action-group { margin-top: 12px; }
     .mod .btn { padding: 8px 15px; font-size: 13px; }
-    .drawer-foot { padding: 16px 28px; border-top: 1px solid var(--line); background: #fff; }
-    .drawer-foot .btn { width: 100%; justify-content: center; }
-    .no-scroll { overflow: hidden; }
-    @media (prefers-reduced-motion: reduce) { .drawer, .drawer-backdrop { transition: none; } }
 </style>
 
 <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeStudent()"></div>

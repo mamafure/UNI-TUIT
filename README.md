@@ -36,7 +36,25 @@ A university tuition-registration portal. Students create an account, pick the m
 |---|---|
 | **Students** | Searchable list of every student. **View** opens a slide-over panel with their details and modules, with Approve and Reject buttons. |
 | **Pending** | One queue of every submission waiting on a decision, across all students. |
-| **Subjects** | Confirmed head-count per module, with the official class list for each. |
+| **Subjects** | Create and manage the modules students can take (see below), plus confirmed head-count and the official class list for each. |
+
+### Managing modules
+
+On **Subjects**, press **New module** and fill in the form in the slide-over panel:
+
+| Field | Notes |
+|---|---|
+| Name, description | Required. The description is the overview students read. |
+| What students will learn | One topic per line, up to 12. |
+| Instructor, duration | Optional; shown on the module page and catalogue. |
+| Registration fee | Whole Tsh. This exact amount is what a student is charged when they add the module. |
+| Module code | Optional. Leave blank and it becomes `MOD-07`, `MOD-08`, and so on. |
+| Icon and colour | Pick from the sets shown. A live preview updates as you type. |
+| Visible to students | Off keeps the module as a draft that students cannot see. |
+
+Press **Edit** on any card to change it, hide or show it, or delete it. Renaming a module keeps everyone's existing registrations attached to it. A module that already has registrations can only be **hidden**, never deleted, so records are never orphaned.
+
+The first time the app runs it creates the `modules` table and adds a few starter modules by itself. Only the ones that were already visible to students start visible.
 
 Admins and students use the **same login form**. An account whose `role` is `admin` is sent to the admin dashboard automatically.
 
@@ -135,7 +153,7 @@ index index.php index.html;
 # Never serve internals, dumps, or dotfiles
 location ~ /\.                                   { deny all; }
 location ~* \.(sql|json|md|yml|yaml|sh|env|log|bak)$ { deny all; }
-location ~* ^/(db|flash|admin_ui)\.php$          { deny all; }
+location ~* ^/(db|flash|admin_ui|modules_lib)\.php$          { deny all; }
 location ^~ /docker/                             { deny all; }
 
 # Old-style /page.php  ->  /page
@@ -241,8 +259,8 @@ To promote an existing student instead: `UPDATE users SET role = 'admin' WHERE e
 | What | Where |
 |---|---|
 | Database credentials | Environment variables, or the defaults in `db.php` |
-| Available modules | The `$all_system_modules` list in `home.php` and the matching list in `admin_subjects.php` |
-| Registration fee per module | `fee` column on each row (defaults to `5000` in `schema.sql`) |
+| Available modules | Managed in the app by admins (Admin → Subjects), stored in the `modules` table |
+| Registration fee per module | Set per module in the admin form (default `5000`) |
 | Colours, fonts | CSS variables at the top of each page's `<style>` block; the admin pages share one set in `admin_ui.php` |
 | Phone number rule | `auth.php` — must be 10 digits starting with `06` or `07` |
 
@@ -258,13 +276,15 @@ admin_auth.php          Handles the admin sign-in form
 
 home.php                Student dashboard
 subject_list.php        Browse and pick modules
-subject_view.php        Module details + "add" action
+subject_view.php        Module details (from the catalogue) + "add" action
 process_submission.php  Student sends Draft modules to the admin (Draft → Pending)
 logout.php
 
 admin.php               Admin: student list + slide-over profile panel
 admin_pending.php       Admin: pending approvals queue
-admin_subjects.php      Admin: per-module statistics
+admin_subjects.php      Admin: module catalogue (create / edit / hide / delete) + statistics
+admin_module_save.php   Saves module changes (admin only, CSRF-protected)
+modules_lib.php         Module catalogue helpers; creates and seeds the modules table
 admin_subject_details.php   Admin: class list for one module
 admin_student_details.php   Admin: full-page student view
 approve.php             Approve / reject action (admin only)
@@ -312,4 +332,5 @@ Please read these before putting real students' data on a public server.
 - **Never commit credentials.** Use environment variables for the database password.
 - **Pick a strong admin password**, and do not reuse it elsewhere.
 - **Some queries are built by string concatenation** (notably in the student login and registration handlers). Treat the app as a learning project and get an independent security review before relying on it for sensitive data. Converting those to prepared statements is the first thing to do.
+- **Admin forms carry a CSRF token** (module create/edit/delete), and all module queries use prepared statements.
 - **Approve and Reject are GET links.** They require an admin session, but they are not protected by CSRF tokens.

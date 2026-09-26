@@ -372,16 +372,20 @@
     </div>
     <div class="module-list">
         <?php
-        $mods = ["Database System", "Function of Single Varriable"];
-        $img = ["db.jpg", "os.jpg", "network.jpg", "web.jpg", "function.jpg"];
-        foreach ($mods as $key => $m) {
-            $i = $img[$key];
-            $tag = "MOD-" . str_pad($key + 1, 2, "0", STR_PAD_LEFT);
+        include 'modules_lib.php';
+        foreach (array_slice(modules_fetch($conn, true), 0, 6) as $m) {
+            $name = htmlspecialchars($m['name'], ENT_QUOTES, 'UTF-8');
+            $tag = htmlspecialchars($m['tag'], ENT_QUOTES, 'UTF-8');
+            $color = htmlspecialchars($m['color'], ENT_QUOTES, 'UTF-8');
+            $icon = htmlspecialchars($m['icon'], ENT_QUOTES, 'UTF-8');
+            $media = $m['image'] !== ''
+                ? "<img src='" . htmlspecialchars($m['image'], ENT_QUOTES, 'UTF-8') . "' alt='{$name}'>"
+                : "<div style='height:150px; display:flex; align-items:center; justify-content:center; font-size:44px; color:rgba(255,255,255,.9); background:linear-gradient(135deg, {$color}, #10254e)'><i class='fas {$icon}'></i></div>";
             echo "<div class='card' onclick=\"openModal('login')\">
-                    <img src='$i' alt='$m'>
+                    {$media}
                     <div class='card-body'>
-                        <span class='card-tag'>$tag</span>
-                        <h3>$m</h3>
+                        <span class='card-tag'>{$tag}</span>
+                        <h3>{$name}</h3>
                     </div>
                   </div>";
         }

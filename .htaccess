@@ -3,7 +3,7 @@ RedirectMatch 404 ^/(\.git|docker)(/|$)
 <FilesMatch "(^\.|\.(sql|json|md|yml|yaml|sh|env|log|bak)$|^Dockerfile$|^docker-compose)">
     Require all denied
 </FilesMatch>
-<FilesMatch "^(admin_ui|flash|db)\.php$">
+<FilesMatch "^(admin_ui|flash|db|modules_lib)\.php$">
     Require all denied
 </FilesMatch>
 

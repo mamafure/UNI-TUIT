@@ -64,6 +64,7 @@ if(!isset($_SESSION['user_id'])) { header("Location: /"); exit(); }
         .card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .card:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
         .card img { width: 100%; height: 160px; object-fit: cover; }
+        .card-ph { height: 160px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.9); font-size: 46px; }
         .card-body { padding: 22px; }
         .card-tag { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; }
         .card-body h3 { font-size: 1.15rem; margin: 6px 0 10px; }
@@ -100,21 +101,28 @@ if(!isset($_SESSION['user_id'])) { header("Location: /"); exit(); }
 <div class="catalogue">
     <div class="grid">
         <?php
-        // Define our modules with images
-        $modules = [
-            ["name" => "Database System", "img" => "db.jpg", "tag" => "MOD-01", "color" => "#2563eb"],
-            ["name" => "Function of Single Varriable", "img" => "function.jpg", "tag" => "MOD-02", "color" => "#ea580c"]
-        ];
-
+        include 'modules_lib.php';
+        $modules = modules_fetch($conn, true);
+        if (!$modules) {
+            echo "<p style='color:var(--ink-soft)'>No modules are open for registration right now. Please check back soon.</p>";
+        }
         foreach ($modules as $m) {
             $name = htmlspecialchars($m['name'], ENT_QUOTES, 'UTF-8');
+            $tag = htmlspecialchars($m['tag'], ENT_QUOTES, 'UTF-8');
+            $color = htmlspecialchars($m['color'], ENT_QUOTES, 'UTF-8');
+            $icon = htmlspecialchars($m['icon'], ENT_QUOTES, 'UTF-8');
+            $fee = number_format((int)$m['fee']);
+            $media = $m['image'] !== ''
+                ? "<img src='" . htmlspecialchars($m['image'], ENT_QUOTES, 'UTF-8') . "' alt='{$name}'>"
+                : "<div class='card-ph' style='background:linear-gradient(135deg, {$color}, #10254e)'><i class='fas {$icon}'></i></div>";
+            $extra = trim(($m['instructor'] !== '' ? htmlspecialchars($m['instructor'], ENT_QUOTES, 'UTF-8') : '') . ($m['instructor'] !== '' && $m['duration'] !== '' ? ' &middot; ' : '') . ($m['duration'] !== '' ? htmlspecialchars($m['duration'], ENT_QUOTES, 'UTF-8') : ''));
             echo "
             <div class='card'>
-                <img src='{$m['img']}' alt='{$name}'>
+                {$media}
                 <div class='card-body'>
-                    <span class='card-tag' style='color:{$m['color']}'>{$m['tag']}</span>
-                    <h3>{$name}</h3>
-                    <p class='card-fee'>Registration fee <strong>15,000 Tsh</strong></p>
+                    <span class='card-tag' style='color:{$color}'>{$tag}</span>
+                    <h3>{$name}</h3>" . ($extra !== '' ? "<p class='card-fee' style='margin-bottom:4px'>{$extra}</p>" : "") . "
+                    <p class='card-fee'>Registration fee <strong>{$fee} Tsh</strong></p>
                     <a href='subject_view?name=" . urlencode($m['name']) . "' class='btn btn-gold btn-view'>View Details <i class='fas fa-arrow-right'></i></a>
                 </div>
             </div>";
