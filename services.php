@@ -37,14 +37,14 @@
         .brand-word { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; }
 
         /* Hero */
-        .hero { background: radial-gradient(circle at 85% 0%, rgba(201,154,59,.2), transparent 45%), linear-gradient(135deg, var(--ink) 0%, var(--ink-2) 100%); padding: 56px 6% 96px; }
+        .hero { background: radial-gradient(circle at 85% 0%, rgba(201,154,59,.2), transparent 45%), linear-gradient(135deg, var(--ink) 0%, var(--ink-2) 100%); padding: 30px 6% 64px; }
         .hero-inner { max-width: 1080px; margin: 0 auto; }
         .hero .eyebrow { color: var(--gold-light); }
-        .hero h1 { color: #fff; font-size: clamp(1.9rem, 4vw, 2.6rem); margin: 12px 0 12px; }
-        .hero p { color: rgba(255,255,255,.75); margin: 0; max-width: 560px; line-height: 1.6; }
+        .hero h1 { color: #fff; font-size: clamp(1.6rem, 3vw, 2rem); margin: 8px 0 6px; }
+        .hero p { color: rgba(255,255,255,.75); margin: 0; max-width: 560px; line-height: 1.5; font-size: 14.5px; }
 
         /* Service cards */
-        .services { max-width: 1080px; margin: -56px auto 0; padding: 0 6%; display: grid; gap: 28px; }
+        .services { max-width: 1080px; margin: -36px auto 0; padding: 0 6%; display: grid; gap: 28px; }
         .service { background: #fff; border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow); overflow: hidden; display: grid; grid-template-columns: 1fr 1fr; min-height: 380px; }
         .service.flip .service-img { order: 2; }
         .service-img { background-size: cover; background-position: center; min-height: 260px; }
@@ -72,7 +72,7 @@
             .service.flip .service-img { order: 0; }
             .service-img { min-height: 220px; }
             .service-body { padding: 28px 24px 32px; }
-            .hero { padding: 40px 5% 88px; }
+            .hero { padding: 24px 5% 56px; }
             .services, .cta-wrap { padding: 0 5%; }
             .cta { padding: 34px 22px; }
         }
