@@ -2,7 +2,7 @@
 include 'db.php';
 include 'flash.php';
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') { header("Location: admin_login.php"); exit(); }
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') { header("Location: admin_login"); exit(); }
 
 include 'admin_ui.php';
 
@@ -11,7 +11,7 @@ $user_id = (int)($_GET['user_id'] ?? 0);
 $student = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM users WHERE id = $user_id"));
 if (!$student) {
     flash_set('error', 'That student could not be found.');
-    header("Location: admin.php");
+    header("Location: admin");
     exit();
 }
 
@@ -24,7 +24,7 @@ admin_page_start('Student: ' . $student['username'], 'students', [
     'heading' => $student['username'],
     'sub' => 'Review this student\'s modules and confirm or reject submissions.',
     'stats' => false,
-    'back' => ['admin.php', 'Back to Student List'],
+    'back' => ['admin', 'Back to Student List'],
 ]);
 ?>
     <div class="panel">
@@ -59,7 +59,7 @@ admin_page_start('Student: ' . $student['username'], 'students', [
                 <?php foreach ($regs as $row):
                     $status = $row['status'];
                     $reg_id = (int)$row['id'];
-                    $base = "approve.php?id={$reg_id}&user_id={$user_id}";
+                    $base = "approve?id={$reg_id}&user_id={$user_id}";
                 ?>
                     <tr>
                         <td><strong><?php echo admin_h($row['module_name']); ?></strong></td>

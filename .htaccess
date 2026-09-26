@@ -1,0 +1,39 @@
+# ---- Never serve internals, dumps, or dotfiles ----
+RedirectMatch 404 ^/(\.git|docker)(/|$)
+<FilesMatch "(^\.|\.(sql|json|md|yml|yaml|sh|env|log|bak)$|^Dockerfile$|^docker-compose)">
+    Require all denied
+</FilesMatch>
+<FilesMatch "^(admin_ui|flash|db)\.php$">
+    Require all denied
+</FilesMatch>
+
+# ---- Clean URLs: /admin instead of /admin.php ----
+RewriteEngine On
+
+# Old-style GET links: /admin.php?x=1 -> /admin?x=1 (POSTs are left alone so forms never break).
+# Behind the HTTPS proxy Apache only sees http, so build the redirect from X-Forwarded-Proto.
+RewriteCond %{REQUEST_METHOD} =GET
+RewriteCond %{HTTP:X-Forwarded-Proto} =https
+RewriteCond %{THE_REQUEST} \s/index\.php[\s?]
+RewriteRule ^index\.php$ https://%{HTTP_HOST}/ [R=301,L]
+
+RewriteCond %{REQUEST_METHOD} =GET
+RewriteCond %{HTTP:X-Forwarded-Proto} =https
+RewriteCond %{THE_REQUEST} \s/([^\s?]+?)\.php[\s?]
+RewriteRule ^ https://%{HTTP_HOST}/%1 [R=301,L]
+
+RewriteCond %{REQUEST_METHOD} =GET
+RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+RewriteCond %{THE_REQUEST} \s/index\.php[\s?]
+RewriteRule ^index\.php$ / [R=301,L]
+
+RewriteCond %{REQUEST_METHOD} =GET
+RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+RewriteCond %{THE_REQUEST} \s/([^\s?]+?)\.php[\s?]
+RewriteRule ^ /%1 [R=301,L]
+
+# Serve /admin from admin.php when that file exists
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/$1.php -f
+RewriteRule ^(.+?)/?$ $1.php [L]

@@ -3,7 +3,7 @@ include 'db.php';
 include 'flash.php';
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: admin_login.php");
+    header("Location: admin_login");
     exit();
 }
 
@@ -19,10 +19,10 @@ if (isset($_GET['id'])) {
     // Destination to redirect back to, decided before we know success/failure
     $return = $_GET['return'] ?? '';
     $return_to = $return === 'pending'
-        ? "admin_pending.php"
+        ? "admin_pending"
         : ($return === 'students'
-            ? "admin.php?open=$user_id"
-            : "admin_student_details.php?user_id=$user_id");
+            ? "admin?open=$user_id"
+            : "admin_student_details?user_id=$user_id");
 
     if (mysqli_stmt_execute($stmt)) {
         flash_set(
@@ -30,7 +30,7 @@ if (isset($_GET['id'])) {
             $action === 'reject' ? 'Registration rejected.' : 'Registration approved.'
         );
     } else {
-        error_log('approve.php update failed: ' . mysqli_error($conn));
+        error_log('approve update failed: ' . mysqli_error($conn));
         flash_set('error', 'Something went wrong updating that registration. Please try again.');
     }
 

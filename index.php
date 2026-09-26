@@ -289,15 +289,15 @@
 <?php flash_render(); ?>
 
 <header class="site-header">
-    <a class="brand" href="index.php">
+    <a class="brand" href="/">
         <span class="brand-mark">UT</span>
         <span class="brand-word">UNI<em>·</em>TUIT</span>
     </a>
     <nav class="nav-desktop">
-        <a href="index.php">Home</a>
+        <a href="/">Home</a>
         <a href="#modules">Modules</a>
         <a href="#about">About</a>
-        <a href="services.php">Other Services</a>
+        <a href="services">Other Services</a>
         <a href="#contact">Contact</a>
         <div class="nav-actions">
             <button class="btn btn-ghost" onclick="openModal('login')">Log in</button>
@@ -313,10 +313,10 @@
     <div class="mobile-nav-backdrop" onclick="toggleMenu()"></div>
     <div class="mobile-nav-panel">
         <button class="mobile-nav-close" aria-label="Close menu" onclick="toggleMenu()">&times;</button>
-        <a href="index.php">Home</a>
+        <a href="/">Home</a>
         <a href="#modules" onclick="toggleMenu()">Modules</a>
         <a href="#about" onclick="toggleMenu()">About</a>
-        <a href="services.php">Other Services</a>
+        <a href="services">Other Services</a>
         <a href="#contact" onclick="toggleMenu()">Contact</a>
         <div class="mobile-nav-actions">
             <button class="btn btn-ghost btn-block" onclick="toggleMenu(); openModal('login')">Log in</button>
@@ -392,7 +392,7 @@
 <section class="services-band">
     <h2>Beyond Tuition&hellip;</h2>
     <p>Discover professional tech solutions provided by our parent company.</p>
-    <a href="services.php" class="btn btn-gold">Explore Our Other Services <i class="fas fa-arrow-right"></i></a>
+    <a href="services" class="btn btn-gold">Explore Our Other Services <i class="fas fa-arrow-right"></i></a>
 </section>
 
 <footer id="contact">
@@ -423,7 +423,7 @@
             <div class="auth-panel" id="panel-login">
                 <h2>Welcome back</h2>
                 <p class="hint">Log in to continue your modules.</p>
-                <form action="auth.php" method="POST" id="loginForm">
+                <form action="auth" method="POST" id="loginForm">
                     <div class="field">
                         <label for="login-email">Email address</label>
                         <input id="login-email" type="email" name="email" placeholder="you@example.com" required>
@@ -440,7 +440,7 @@
             <div class="auth-panel" id="panel-register">
                 <h2>Create your account</h2>
                 <p class="hint">Register once, access every module.</p>
-                <form action="auth.php" method="POST" id="registerForm">
+                <form action="auth" method="POST" id="registerForm">
                     <div class="field">
                         <label for="reg-username">Username</label>
                         <input id="reg-username" type="text" name="username" placeholder="Jane Doe" required>
@@ -513,7 +513,7 @@
         var form = document.getElementById(formId);
         form.addEventListener('submit', function () {
             var btn = document.getElementById(btnId);
-            // Defer: a button disabled during 'submit' is dropped from the form data (login/register never reach auth.php)
+            // Defer: a button disabled during 'submit' is dropped from the form data (login/register never reach auth)
             setTimeout(function () {
                 btn.disabled = true;
                 btn.style.opacity = '0.75';
@@ -524,7 +524,7 @@
     withLoadingState('loginForm', 'loginBtn', 'Logging in&hellip;');
     withLoadingState('registerForm', 'registerBtn', 'Creating account&hellip;');
 
-    // Reopen the auth modal on the right tab after a redirect back from auth.php
+    // Reopen the auth modal on the right tab after a redirect back from auth
     var __authTab = new URLSearchParams(location.search).get('auth');
     if (__authTab === 'login' || __authTab === 'register') {
         openModal(__authTab);

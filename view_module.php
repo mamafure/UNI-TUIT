@@ -7,7 +7,7 @@ $user_id = $_SESSION['user_id'];
 // Handle Registration
 if (isset($_POST['confirm_select'])) {
     mysqli_query($conn, "INSERT INTO student_modules (user_id, module_name) VALUES ('$user_id', '$module_name')");
-    echo "<script>alert('Module Added Successfully!'); window.location='dashboard.php';</script>";
+    echo "<script>alert('Module Added Successfully!'); window.location='dashboard';</script>";
 }
 ?>
 
@@ -34,7 +34,7 @@ if (isset($_POST['confirm_select'])) {
         <button type="submit" name="confirm_select" class="btn-add">Select this Subject</button>
     </form>
     <br>
-    <a href="dashboard.php">Go Back</a>
+    <a href="dashboard">Go Back</a>
 </div>
 
 </body>

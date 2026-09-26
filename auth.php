@@ -13,17 +13,17 @@ if (isset($_POST['register'])) {
     // Validation
     if (!preg_match('/^(06|07)[0-9]{8}$/', $phone)) {
         flash_set('error', 'Phone must be 10 digits starting with 06 or 07.');
-        header("Location: index.php?auth=register");
+        header("Location: /?auth=register");
         exit();
     } else {
         $sql = "INSERT INTO users (username, phone, email, password, program) VALUES ('$user', '$phone', '$email', '$pass', '$prog')";
         if (mysqli_query($conn, $sql)) {
             flash_set('success', 'Account created! Please log in to continue.');
-            header("Location: index.php?auth=login");
+            header("Location: /?auth=login");
             exit();
         } else {
             flash_set('error', 'That email is already registered. Try logging in instead.');
-            header("Location: index.php?auth=register");
+            header("Location: /?auth=register");
             exit();
         }
     }
@@ -43,17 +43,17 @@ if (isset($_POST['login'])) {
             $_SESSION['admin_id'] = $row['id'];
             $_SESSION['username'] = $row['username'];
             $_SESSION['role'] = 'admin';
-            header("Location: admin.php");
+            header("Location: admin");
             exit();
         }
         $_SESSION['user_id'] = $row['id'];
         $_SESSION['username'] = $row['username'];
         flash_set('success', 'Welcome back, ' . $row['username'] . '!');
-        header("Location: home.php");
+        header("Location: home");
         exit();
     } else {
         flash_set('error', 'Wrong email or password.');
-        header("Location: index.php?auth=login");
+        header("Location: /?auth=login");
         exit();
     }
 }

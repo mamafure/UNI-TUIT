@@ -3,7 +3,7 @@ include 'db.php';
 
 // ACCESS CONTROL: Admin only
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: admin_login.php");
+    header("Location: admin_login");
     exit();
 }
 
@@ -163,7 +163,7 @@ admin_page_start('Student Registrations', 'students', [
         document.getElementById('drawerCount').textContent = s.regs.length + (s.regs.length === 1 ? ' module' : ' modules');
         var html = '';
         s.regs.forEach(function (r) {
-            var st = r.status.toLowerCase(), base = 'approve.php?id=' + r.id + '&user_id=' + s.id + '&return=students';
+            var st = r.status.toLowerCase(), base = 'approve?id=' + r.id + '&user_id=' + s.id + '&return=students';
             var actions = '';
             if (r.status === 'Pending') {
                 actions = '<div class="action-group">' +
@@ -176,7 +176,7 @@ admin_page_start('Student Registrations', 'students', [
                     '<div class="mod-fee">' + fmt(r.fee) + ' Tsh</div>' + actions + '</div>';
         });
         document.getElementById('drawerMods').innerHTML = html || '<div class="empty-state" style="padding:24px 0"><p>No modules selected yet.</p></div>';
-        document.getElementById('drawerFull').href = 'admin_student_details.php?user_id=' + s.id;
+        document.getElementById('drawerFull').href = 'admin_student_details?user_id=' + s.id;
         document.getElementById('drawerBackdrop').classList.add('open');
         var d = document.getElementById('drawer'); d.classList.add('open'); d.setAttribute('aria-hidden', 'false');
         document.body.classList.add('no-scroll');
@@ -196,7 +196,7 @@ admin_page_start('Student Registrations', 'students', [
 
     // Reopen after Approve/Reject so the admin stays in context
     var openId = new URLSearchParams(location.search).get('open');
-    if (openId && STUDENTS[openId]) { openStudent(openId); history.replaceState(null, '', 'admin.php'); }
+    if (openId && STUDENTS[openId]) { openStudent(openId); history.replaceState(null, '', 'admin'); }
 
     var box = document.getElementById('studentSearch');
     if (box) box.addEventListener('input', function () {

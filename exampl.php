@@ -108,7 +108,7 @@ $seller_id = $seller_data['id'];
 
     <!-- Bottom Nav -->
     <div style="position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #ddd;">
-        <a href="index.php" style="text-decoration:none; color:#888;"><i class="fa fa-home"></i> Nyumbani</a>
+        <a href="/" style="text-decoration:none; color:#888;"><i class="fa fa-home"></i> Nyumbani</a>
         <a href="profile.php" style="text-decoration:none; color:#27ae60;"><i class="fa fa-user"></i> Akaunti</a>
     </div>
 

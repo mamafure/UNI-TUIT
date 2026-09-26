@@ -1,5 +1,5 @@
 <?php
-// Shared chrome for every admin page: same paper/ink/gold look as the student portal (home.php).
+// Shared chrome for every admin page: same paper/ink/gold look as the student portal (home).
 // Usage:
 //   admin_page_start('Page title', 'students|pending|subjects', ['heading' => ..., 'sub' => ..., 'eyebrow' => ..., 'stats' => true|false, 'back' => [url, label]]);
 //   ... page content (usually inside <div class="panel"> ... </div>) ...
@@ -28,10 +28,10 @@ function admin_page_start($title, $active, $o = []) {
     $admin_name = admin_h($_SESSION['username'] ?? 'Admin');
 
     $nav = [
-        'students' => ['admin.php', 'fa-users', 'Students'],
-        'pending'  => ['admin_pending.php', 'fa-hourglass-half', 'Pending'],
-        'subjects' => ['admin_subjects.php', 'fa-book', 'Subjects'],
-        'services' => ['services.php', 'fa-tools', 'Services'],
+        'students' => ['admin', 'fa-users', 'Students'],
+        'pending'  => ['admin_pending', 'fa-hourglass-half', 'Pending'],
+        'subjects' => ['admin_subjects', 'fa-book', 'Subjects'],
+        'services' => ['services', 'fa-tools', 'Services'],
     ];
     ?>
 <!DOCTYPE html>
@@ -175,7 +175,7 @@ function admin_page_start($title, $active, $o = []) {
         .confirm-actions { display: flex; gap: 10px; }
         .confirm-actions .btn { flex: 1; justify-content: center; padding: 12px 18px; }
 
-        /* Flash toast styles come from flash.php */
+        /* Flash toast styles come from flash */
 
         @media (max-width: 820px) {
             .portal-header { flex-wrap: wrap; padding: 12px 5%; }
@@ -197,7 +197,7 @@ function admin_page_start($title, $active, $o = []) {
 <?php flash_render(); ?>
 
 <header class="portal-header">
-    <a class="brand" href="admin.php">
+    <a class="brand" href="admin">
         <span class="brand-mark">UT</span>
         <span class="brand-word">UNI·TUIT</span>
         <span class="brand-tag">Admin</span>
@@ -212,7 +212,7 @@ function admin_page_start($title, $active, $o = []) {
     </nav>
     <div class="header-right">
         <span class="admin-chip"><?php echo $admin_name; ?></span>
-        <a class="icon-btn" href="logout.php" title="Log out" aria-label="Log out"><i class="fas fa-right-from-bracket"></i></a>
+        <a class="icon-btn" href="logout" title="Log out" aria-label="Log out"><i class="fas fa-right-from-bracket"></i></a>
     </div>
 </header>
 

@@ -145,7 +145,7 @@
         <h3>Need a Custom Solution?</h3>
         <p>Our team is ready to help you navigate your technical challenges.</p>
         <br>
-        <a href="index.php" style="text-decoration: none; color: var(--primary); font-weight: bold;"><i class="fas fa-arrow-left"></i> Back to UNI-TUIT Home</a>
+        <a href="/" style="text-decoration: none; color: var(--primary); font-weight: bold;"><i class="fas fa-arrow-left"></i> Back to UNI-TUIT Home</a>
     </section>
 
 </body>

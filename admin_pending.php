@@ -3,7 +3,7 @@ include 'db.php';
 include 'flash.php';
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: admin_login.php");
+    header("Location: admin_login");
     exit();
 }
 
@@ -55,7 +55,7 @@ admin_page_start('Pending Approvals', 'pending', [
                 <tbody>
                 <?php foreach ($pending as $row):
                     $rid = (int)$row['id']; $uid = (int)$row['user_id'];
-                    $base = "approve.php?id={$rid}&user_id={$uid}&return=pending";
+                    $base = "approve?id={$rid}&user_id={$uid}&return=pending";
                 ?>
                     <tr>
                         <td><div class="person"><span class="avatar"><?php echo admin_h(strtoupper(mb_substr($row['username'], 0, 1))); ?></span><strong><?php echo admin_h($row['username']); ?></strong></div></td>

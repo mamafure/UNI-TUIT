@@ -1,7 +1,7 @@
 <?php
 include 'db.php';
 include 'flash.php';
-if(!isset($_SESSION['user_id'])) { header("Location: index.php"); exit(); }
+if(!isset($_SESSION['user_id'])) { header("Location: /"); exit(); }
 
 $u_id = $_SESSION['user_id'];
 
@@ -10,7 +10,7 @@ $role_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT role FROM users WHERE
 if ($role_row && $role_row['role'] === 'admin') {
     $_SESSION['admin_id'] = (int)$u_id;
     $_SESSION['role'] = 'admin';
-    header("Location: admin.php");
+    header("Location: admin");
     exit();
 }
 
@@ -197,13 +197,13 @@ $js_name = json_encode($_SESSION['username']);
 <?php flash_render(); ?>
 
 <header class="portal-header">
-    <a class="brand" href="home.php">
+    <a class="brand" href="home">
         <span class="brand-mark">UT</span>
         <span class="brand-word">UNI&middot;TUIT</span>
     </a>
     <div class="portal-actions">
-        <a href="subject_list.php" class="btn btn-outline">Browse Modules</a>
-        <a href="logout.php" class="icon-btn" title="Log out" aria-label="Log out"><i class="fas fa-sign-out-alt"></i></a>
+        <a href="subject_list" class="btn btn-outline">Browse Modules</a>
+        <a href="logout" class="icon-btn" title="Log out" aria-label="Log out"><i class="fas fa-sign-out-alt"></i></a>
     </div>
 </header>
 
@@ -285,7 +285,7 @@ $js_name = json_encode($_SESSION['username']);
 
         <!-- SMART BUTTON LOGIC: Hide button if user has all subjects -->
         <?php if ($user_total_count < 2): ?>
-            <a href="subject_list.php" class="browse-link">
+            <a href="subject_list" class="browse-link">
                 <i class="fas fa-plus"></i> <?php echo $btn_main_text; ?>
             </a>
         <?php else: ?>
@@ -338,7 +338,7 @@ $js_name = json_encode($_SESSION['username']);
         btn.disabled = true;
         btn.style.opacity = '0.75';
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending&hellip;';
-        window.location.href = 'process_submission.php';
+        window.location.href = 'process_submission';
     }
 
     document.getElementById('confirmModal').addEventListener('click', function (e) {

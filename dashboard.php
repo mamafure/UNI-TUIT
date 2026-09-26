@@ -1,7 +1,7 @@
 <?php
 include 'db.php';
 session_start();
-if (!isset($_SESSION['user_id'])) { header("Location: index.php"); }
+if (!isset($_SESSION['user_id'])) { header("Location: /"); }
 
 $user_id = $_SESSION['user_id'];
 
@@ -31,7 +31,7 @@ while($row = mysqli_fetch_assoc($my_modules)) {
 
 <div class="header">
     <h2>Welcome, <?php echo $_SESSION['username']; ?>!</h2>
-    <a href="logout.php" style="color: white;">Logout</a>
+    <a href="logout" style="color: white;">Logout</a>
 </div>
 
 <h3>Available Modules (Fee: 5,000 Tsh each)</h3>
@@ -44,7 +44,7 @@ while($row = mysqli_fetch_assoc($my_modules)) {
         if (in_array($m, $selected_list)) {
             echo "<p class='status'><i class='fas fa-check-circle'></i> Already Selected</p>";
         } else {
-            echo "<a href='view_module.php?name=$m' class='btn'>View & Register</a>";
+            echo "<a href='view_module?name=$m' class='btn'>View & Register</a>";
         }
         echo "</div>";
     }

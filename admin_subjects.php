@@ -3,7 +3,7 @@ include 'db.php';
 
 // ACCESS CONTROL
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: admin_login.php");
+    header("Location: admin_login");
     exit();
 }
 
@@ -33,7 +33,7 @@ admin_page_start('Subject Reports', 'subjects', [
                 <h3><?php echo admin_h($m); ?></h3>
                 <div class="num"><?php echo (int)$total; ?></div>
                 <div class="lbl">Confirmed students</div>
-                <a href="admin_subject_details.php?name=<?php echo urlencode($m); ?>" class="btn btn-gold">View class list <i class="fas fa-arrow-right"></i></a>
+                <a href="admin_subject_details?name=<?php echo urlencode($m); ?>" class="btn btn-gold">View class list <i class="fas fa-arrow-right"></i></a>
             </div>
         <?php endforeach; ?>
     </div>

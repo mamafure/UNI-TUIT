@@ -2,7 +2,7 @@
 include 'db.php';
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: admin_login.php");
+    header("Location: admin_login");
     exit();
 }
 
@@ -28,7 +28,7 @@ admin_page_start('Class List: ' . $subject_name, 'subjects', [
     'heading' => $subject_name,
     'sub' => 'Confirmed students registered for this module.',
     'stats' => false,
-    'back' => ['admin_subjects.php', 'Back to Subjects'],
+    'back' => ['admin_subjects', 'Back to Subjects'],
 ]);
 ?>
     <div class="panel">

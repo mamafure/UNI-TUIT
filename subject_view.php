@@ -4,7 +4,7 @@ include 'flash.php';
 
 // Check if user is logged in
 if(!isset($_SESSION['user_id'])) {
-    header("Location: index.php");
+    header("Location: /");
     exit();
 }
 
@@ -68,7 +68,7 @@ if (isset($_POST['add'])) {
         mysqli_query($conn, "INSERT INTO registrations (user_id, module_name,fee,status) VALUES ('$u_id', '$m_name',5000,'Draft')");
         flash_set('success', $m_name . ' has been added to your tuition list.');
     }
-    header("Location: home.php");
+    header("Location: home");
     exit();
 }
 ?>
@@ -187,11 +187,11 @@ if (isset($_POST['add'])) {
 <body>
 
 <header class="portal-header">
-    <a class="brand" href="home.php">
+    <a class="brand" href="home">
         <span class="brand-mark">UT</span>
         <span class="brand-word">UNI&middot;TUIT</span>
     </a>
-    <a href="home.php" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to My List</a>
+    <a href="home" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to My List</a>
 </header>
 
 <section class="subject-hero">

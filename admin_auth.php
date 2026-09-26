@@ -20,17 +20,17 @@ if (isset($_POST['admin_login'])) {
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = 'admin';
 
-            header("Location: admin.php");
+            header("Location: admin");
             exit();
         } else {
             flash_set('error', 'Invalid admin password.');
-            header("Location: admin_login.php");
+            header("Location: admin_login");
             exit();
         }
     } else {
         // No admin found with that email
         flash_set('error', 'Access denied: you are not authorized as an admin.');
-        header("Location: admin_login.php");
+        header("Location: admin_login");
         exit();
     }
 }

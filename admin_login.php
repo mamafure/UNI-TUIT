@@ -41,7 +41,7 @@
     <span class="eyebrow">Admin Console</span>
     <h2>Sign in to continue</h2>
 
-    <form action="admin_auth.php" method="POST" id="adminLoginForm">
+    <form action="admin_auth" method="POST" id="adminLoginForm">
         <div class="form-group">
             <label for="admin-email">Administrator email</label>
             <input id="admin-email" type="email" name="email" placeholder="email@unituit.com" autocomplete="username" required>
@@ -53,13 +53,13 @@
         <button type="submit" name="admin_login" class="btn-login" id="adminLoginBtn">Secure Login</button>
     </form>
 
-    <a href="index.php" class="footer-link"><i class="fas fa-arrow-left"></i> Back to main website</a>
+    <a href="/" class="footer-link"><i class="fas fa-arrow-left"></i> Back to main website</a>
 </div>
 
 <script>
     document.getElementById('adminLoginForm').addEventListener('submit', function () {
         var btn = document.getElementById('adminLoginBtn');
-        // Defer: a button disabled during 'submit' is dropped from the form data (admin_login would not reach admin_auth.php)
+        // Defer: a button disabled during 'submit' is dropped from the form data (admin_login would not reach admin_auth)
         setTimeout(function () {
             btn.disabled = true;
             btn.style.opacity = '0.75';

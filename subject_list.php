@@ -1,7 +1,7 @@
 <?php
 include 'db.php';
 // Protect the page - only logged in users
-if(!isset($_SESSION['user_id'])) { header("Location: index.php"); exit(); }
+if(!isset($_SESSION['user_id'])) { header("Location: /"); exit(); }
 ?>
 
 <!DOCTYPE html>
@@ -82,11 +82,11 @@ if(!isset($_SESSION['user_id'])) { header("Location: index.php"); exit(); }
 <body>
 
 <header class="portal-header">
-    <a class="brand" href="home.php">
+    <a class="brand" href="home">
         <span class="brand-mark">UT</span>
         <span class="brand-word">UNI&middot;TUIT</span>
     </a>
-    <a href="home.php" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to My List</a>
+    <a href="home" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to My List</a>
 </header>
 
 <section class="portal-hero">
@@ -115,7 +115,7 @@ if(!isset($_SESSION['user_id'])) { header("Location: index.php"); exit(); }
                     <span class='card-tag' style='color:{$m['color']}'>{$m['tag']}</span>
                     <h3>{$name}</h3>
                     <p class='card-fee'>Registration fee <strong>15,000 Tsh</strong></p>
-                    <a href='subject_view.php?name=" . urlencode($m['name']) . "' class='btn btn-gold btn-view'>View Details <i class='fas fa-arrow-right'></i></a>
+                    <a href='subject_view?name=" . urlencode($m['name']) . "' class='btn btn-gold btn-view'>View Details <i class='fas fa-arrow-right'></i></a>
                 </div>
             </div>";
         }
