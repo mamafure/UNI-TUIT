@@ -9,3 +9,6 @@ docker/
 *.sql
 if0_*.json
 *_db.json
+
+# Schema-only file is safe to share (no data)
+!schema.sql
