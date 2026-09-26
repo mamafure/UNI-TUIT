@@ -1,5 +1,6 @@
 <?php
 include 'db.php';
+include 'flash.php';
 
 if (isset($_POST['admin_login'])) {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
@@ -22,11 +23,15 @@ if (isset($_POST['admin_login'])) {
             header("Location: admin.php");
             exit();
         } else {
-            echo "<script>alert('Invalid Admin Password!'); window.location='admin_login.php';</script>";
+            flash_set('error', 'Invalid admin password.');
+            header("Location: admin_login.php");
+            exit();
         }
     } else {
         // No admin found with that email
-        echo "<script>alert('Access Denied: You are not authorized as an Admin.'); window.location='admin_login.php';</script>";
+        flash_set('error', 'Access denied: you are not authorized as an admin.');
+        header("Location: admin_login.php");
+        exit();
     }
 }
 ?>

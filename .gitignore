@@ -1,0 +1,11 @@
+# Docker (local-only — intentionally never pushed to GitHub)
+Dockerfile
+docker-compose.yml
+docker-compose.override.yml
+.dockerignore
+docker/
+
+# Real database exports/dumps — contain live user PII and password hashes
+*.sql
+if0_*.json
+*_db.json

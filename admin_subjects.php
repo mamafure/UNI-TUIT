@@ -9,6 +9,9 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 
 // Define the core modules
 $modules = ["Database System", "OS", "Networking", "Web Programming", "Calculus"];
+
+$pending_count_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM registrations WHERE status = 'Pending'"));
+$pending_count = $pending_count_row['n'];
 ?>
 
 <!DOCTYPE html>
@@ -22,8 +25,9 @@ $modules = ["Database System", "OS", "Networking", "Web Programming", "Calculus"
         body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; display: flex; }
         
         .sidebar { width: 250px; background: var(--primary); height: 100vh; color: white; padding: 20px; position: fixed; }
-        .sidebar a { color: white; text-decoration: none; display: block; padding: 12px; margin: 5px 0; border-radius: 8px; }
+        .sidebar a { color: white; text-decoration: none; display: flex; justify-content: space-between; align-items: center; padding: 12px; margin: 5px 0; border-radius: 8px; }
         .sidebar a:hover { background: rgba(255,255,255,0.1); }
+        .nav-badge { background: #f59e0b; color: white; font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 10px; }
 
         .main { margin-left: 250px; width: 100%; padding: 40px; }
         
@@ -52,6 +56,10 @@ $modules = ["Database System", "OS", "Networking", "Web Programming", "Calculus"
 <div class="sidebar">
     <h2>UNI-TUIT Admin</h2>
     <a href="admin.php"><i class="fas fa-users"></i> Student List</a>
+    <a href="admin_pending.php">
+        <span><i class="fas fa-hourglass-half"></i> Pending Approvals</span>
+        <?php if ($pending_count > 0): ?><span class="nav-badge"><?php echo $pending_count; ?></span><?php endif; ?>
+    </a>
     <a href="admin_subjects.php" style="background:rgba(255,255,255,0.1)"><i class="fas fa-book"></i> Subject Reports</a>
     <a href="services.php"><i class="fas fa-tools"></i> Services</a>
     <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>

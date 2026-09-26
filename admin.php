@@ -6,6 +6,9 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: admin_login.php");
     exit();
 }
+
+$pending_count_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS n FROM registrations WHERE status = 'Pending'"));
+$pending_count = $pending_count_row['n'];
 ?>
 
 <!DOCTYPE html>
@@ -21,8 +24,9 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
         /* Sidebar */
         .sidebar { width: 250px; background: var(--primary); height: 100vh; color: white; padding: 20px; position: fixed; }
         .sidebar h2 { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-        .sidebar a { color: white; text-decoration: none; display: block; padding: 12px; margin: 5px 0; border-radius: 8px; }
+        .sidebar a { color: white; text-decoration: none; display: flex; justify-content: space-between; align-items: center; padding: 12px; margin: 5px 0; border-radius: 8px; }
         .sidebar a:hover { background: rgba(255,255,255,0.1); }
+        .nav-badge { background: #f59e0b; color: white; font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 10px; }
 
         /* Main Content */
         .main { margin-left: 250px; width: 100%; padding: 40px; }
@@ -31,7 +35,10 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th { text-align: left; padding: 15px; background: #f8fafc; color: #64748b; text-transform: uppercase; font-size: 13px; }
         td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
-        
+
+        tr.student-row { cursor: pointer; transition: background 0.15s; }
+        tr.student-row:hover { background: #f8fafc; }
+
         .btn-view { background: var(--primary); color: white; padding: 8px 15px; border-radius: 6px; text-decoration: none; font-size: 13px; }
         .subject-count { background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 12px; }
     </style>
@@ -40,7 +47,11 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 
 <div class="sidebar">
     <h2>UNI-TUIT Admin</h2>
-    <a href="admin.php"><i class="fas fa-users"></i> Student List</a>
+    <a href="admin.php" style="background:rgba(255,255,255,0.1)"><i class="fas fa-users"></i> Student List</a>
+    <a href="admin_pending.php">
+        <span><i class="fas fa-hourglass-half"></i> Pending Approvals</span>
+        <?php if ($pending_count > 0): ?><span class="nav-badge"><?php echo $pending_count; ?></span><?php endif; ?>
+    </a>
     <a href="admin_subjects.php"><i class="fas fa-book"></i> Subject Reports</a> <!-- NEW TAB -->
     <a href="services.php"><i class="fas fa-tools"></i> Services</a>
     <a href="logout.php" style="margin-top: 50px;"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -73,12 +84,17 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                 
                 $result = mysqli_query($conn, $sql);
                 while($row = mysqli_fetch_assoc($result)) {
-                    echo "<tr>";
-                    echo "<td><strong>{$row['username']}</strong></td>";
-                    echo "<td>{$row['email']}<br><small>{$row['phone']}</small></td>";
-                    echo "<td>{$row['program']}</td>";
+                    $uid = (int) $row['id'];
+                    $username = htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8');
+                    $email = htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8');
+                    $phone = htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8');
+                    $program = htmlspecialchars($row['program'], ENT_QUOTES, 'UTF-8');
+                    echo "<tr class='student-row' onclick=\"location.href='admin_student_details.php?user_id={$uid}'\">";
+                    echo "<td><strong>{$username}</strong></td>";
+                    echo "<td>{$email}<br><small>{$phone}</small></td>";
+                    echo "<td>{$program}</td>";
                     echo "<td><span class='subject-count'>{$row['total_mods']} Modules</span></td>";
-                    echo "<td><a href='admin_student_details.php?user_id={$row['id']}' class='btn-view'>View Submissions</a></td>";
+                    echo "<td><a href='admin_student_details.php?user_id={$uid}' class='btn-view'>View Submissions</a></td>";
                     echo "</tr>";
                 }
                 

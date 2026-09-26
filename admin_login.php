@@ -1,4 +1,4 @@
-<?php include 'db.php'; ?>
+<?php include 'db.php'; include 'flash.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,11 +83,13 @@
 </head>
 <body>
 
+<?php flash_render(); ?>
+
 <div class="login-box">
     <i class="fas fa-user-shield"></i>
     <h2>Admin Portal</h2>
-    
-    <form action="admin_auth.php" method="POST">
+
+    <form action="admin_auth.php" method="POST" id="adminLoginForm">
         <div class="form-group">
             <label>Administrator Email</label>
             <input type="email" name="email" placeholder="email@unituit.com" required>
@@ -96,11 +98,20 @@
             <label>Secret Password</label>
             <input type="password" name="password" placeholder="••••••••" required>
         </div>
-        <button type="submit" name="admin_login" class="btn-login">Secure Login</button>
+        <button type="submit" name="admin_login" class="btn-login" id="adminLoginBtn">Secure Login</button>
     </form>
 
     <a href="index.php" class="footer-link"><i class="fas fa-arrow-left"></i> Back to Main Website</a>
 </div>
+
+<script>
+    document.getElementById('adminLoginForm').addEventListener('submit', function () {
+        var btn = document.getElementById('adminLoginBtn');
+        btn.disabled = true;
+        btn.style.opacity = '0.75';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in&hellip;';
+    });
+</script>
 
 </body>
 </html>
