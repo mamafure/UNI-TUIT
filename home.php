@@ -5,6 +5,15 @@ if(!isset($_SESSION['user_id'])) { header("Location: index.php"); exit(); }
 
 $u_id = $_SESSION['user_id'];
 
+// Admin accounts (e.g. a session opened before admin routing existed) belong on the dashboard
+$role_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT role FROM users WHERE id = " . (int)$u_id));
+if ($role_row && $role_row['role'] === 'admin') {
+    $_SESSION['admin_id'] = (int)$u_id;
+    $_SESSION['role'] = 'admin';
+    header("Location: admin.php");
+    exit();
+}
+
 // 1. Define all available subjects in your system
 $all_system_modules = ["Database System", "OS", "Networking", "Web Programming", "Calculus"];
 $max_modules = count($all_system_modules);
