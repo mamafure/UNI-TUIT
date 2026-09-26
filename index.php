@@ -513,9 +513,12 @@
         var form = document.getElementById(formId);
         form.addEventListener('submit', function () {
             var btn = document.getElementById(btnId);
-            btn.disabled = true;
-            btn.style.opacity = '0.75';
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + label;
+            // Defer: a button disabled during 'submit' is dropped from the form data (login/register never reach auth.php)
+            setTimeout(function () {
+                btn.disabled = true;
+                btn.style.opacity = '0.75';
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + label;
+            }, 0);
         });
     }
     withLoadingState('loginForm', 'loginBtn', 'Logging in&hellip;');

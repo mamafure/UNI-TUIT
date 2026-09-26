@@ -107,9 +107,12 @@
 <script>
     document.getElementById('adminLoginForm').addEventListener('submit', function () {
         var btn = document.getElementById('adminLoginBtn');
-        btn.disabled = true;
-        btn.style.opacity = '0.75';
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in&hellip;';
+        // Defer: a button disabled during 'submit' is dropped from the form data (admin_login would not reach admin_auth.php)
+        setTimeout(function () {
+            btn.disabled = true;
+            btn.style.opacity = '0.75';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in&hellip;';
+        }, 0);
     });
 </script>
 

@@ -237,9 +237,12 @@ if (isset($_POST['add'])) {
 <script>
     document.getElementById('addSubjectForm').addEventListener('submit', function () {
         var btn = document.getElementById('addSubjectBtn');
-        btn.disabled = true;
-        btn.style.opacity = '0.75';
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding&hellip;';
+        // Defer: a button disabled during 'submit' is dropped from the form data
+        setTimeout(function () {
+            btn.disabled = true;
+            btn.style.opacity = '0.75';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding&hellip;';
+        }, 0);
     });
 </script>
 
