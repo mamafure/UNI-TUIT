@@ -17,9 +17,12 @@ if (isset($_GET['id'])) {
     mysqli_stmt_bind_param($stmt, 'si', $new_status, $reg_id);
 
     // Destination to redirect back to, decided before we know success/failure
-    $return_to = (($_GET['return'] ?? '') === 'pending')
+    $return = $_GET['return'] ?? '';
+    $return_to = $return === 'pending'
         ? "admin_pending.php"
-        : "admin_student_details.php?user_id=$user_id";
+        : ($return === 'students'
+            ? "admin.php?open=$user_id"
+            : "admin_student_details.php?user_id=$user_id");
 
     if (mysqli_stmt_execute($stmt)) {
         flash_set(

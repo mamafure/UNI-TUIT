@@ -21,6 +21,20 @@ $result = mysqli_query($conn, $sql);
 $students = [];
 while ($row = mysqli_fetch_assoc($result)) { $students[] = $row; }
 
+// Data for the slide-over panel (all students are small enough to embed)
+$drawer = [];
+foreach ($students as $s) {
+    $drawer[(int)$s['id']] = ['id' => (int)$s['id'], 'name' => $s['username'], 'email' => $s['email'],
+        'phone' => $s['phone'], 'program' => $s['program'], 'regs' => []];
+}
+$rq = mysqli_query($conn, "SELECT id, user_id, module_name, fee, status FROM registrations ORDER BY id ASC");
+while ($r = mysqli_fetch_assoc($rq)) {
+    if (isset($drawer[(int)$r['user_id']])) {
+        $drawer[(int)$r['user_id']]['regs'][] = ['id' => (int)$r['id'], 'module' => $r['module_name'],
+            'fee' => (float)$r['fee'], 'status' => $r['status']];
+    }
+}
+
 admin_page_start('Student Registrations', 'students', [
     'heading' => 'Student Registrations',
     'sub' => 'Every student who has applied for modules, with their current activity.',
@@ -63,7 +77,7 @@ admin_page_start('Student Registrations', 'students', [
                     $pend = (int)$s['pending_mods'];
                     $mods = (int)$s['total_mods'];
                 ?>
-                    <tr class="clickable" onclick="location.href='admin_student_details.php?user_id=<?php echo $uid; ?>'">
+                    <tr class="clickable" tabindex="0" onclick="openStudent(<?php echo $uid; ?>)" onkeydown="if(event.key==='Enter')openStudent(<?php echo $uid; ?>)">
                         <td><div class="person"><span class="avatar"><?php echo admin_h($initial); ?></span><strong><?php echo admin_h($s['username']); ?></strong></div></td>
                         <td><?php echo admin_h($s['email']); ?><br><small><?php echo admin_h($s['phone']); ?></small></td>
                         <td><?php echo admin_h($s['program']); ?></td>
@@ -71,7 +85,7 @@ admin_page_start('Student Registrations', 'students', [
                             <span class="count-pill"><?php echo $mods; ?> <?php echo $mods === 1 ? 'module' : 'modules'; ?></span>
                             <?php if ($pend > 0): ?><span class="badge badge-pending"><?php echo $pend; ?> pending</span><?php endif; ?>
                         </div></td>
-                        <td><a href="admin_student_details.php?user_id=<?php echo $uid; ?>" class="btn btn-outline">View <i class="fas fa-arrow-right"></i></a></td>
+                        <td><button type="button" class="btn btn-outline" onclick="event.stopPropagation(); openStudent(<?php echo $uid; ?>)">View <i class="fas fa-arrow-right"></i></button></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
@@ -80,7 +94,109 @@ admin_page_start('Student Registrations', 'students', [
         <?php endif; ?>
     </div>
 
+<style>
+    .drawer-backdrop { position: fixed; inset: 0; z-index: 1500; background: rgba(16,37,78,.35); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); opacity: 0; visibility: hidden; transition: opacity .25s ease, visibility .25s; }
+    .drawer-backdrop.open { opacity: 1; visibility: visible; }
+    .drawer { position: fixed; top: 0; right: 0; bottom: 0; z-index: 1501; width: 440px; max-width: 100%; background: var(--paper); box-shadow: -30px 0 60px -20px rgba(10,20,45,.45); transform: translateX(105%); transition: transform .3s cubic-bezier(.22,.8,.3,1); display: flex; flex-direction: column; }
+    .drawer.open { transform: none; }
+    .drawer-head { background: linear-gradient(135deg, var(--ink), var(--ink-2)); color: #fff; padding: 26px 28px 24px; position: relative; }
+    .drawer-head .eyebrow { color: var(--gold-light); }
+    .drawer-head .avatar { width: 56px; height: 56px; font-size: 19px; background: var(--paper-2); margin: 14px 0 12px; }
+    .drawer-head h2 { color: #fff; font-size: 1.45rem; }
+    .drawer-close { position: absolute; top: 18px; right: 18px; width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); color: #fff; cursor: pointer; font-size: 16px; }
+    .drawer-close:hover { background: rgba(255,255,255,.18); border-color: #fff; }
+    .drawer-body { padding: 22px 28px 28px; overflow-y: auto; flex: 1; }
+    .info-list { display: grid; gap: 14px; margin: 0 0 26px; padding: 0; list-style: none; }
+    .info-list li { display: flex; gap: 14px; align-items: flex-start; font-size: 14.5px; word-break: break-word; }
+    .info-list i { width: 32px; height: 32px; border-radius: 10px; background: var(--paper-2); color: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+    .info-list small { display: block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 2px; }
+    .drawer h3.sec { font-size: 1.05rem; margin-bottom: 12px; display: flex; align-items: baseline; justify-content: space-between; }
+    .drawer h3.sec span { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-soft); font-weight: 500; }
+    .mod { background: #fff; border: 1px solid var(--line); border-left: 3px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+    .mod.s-pending { border-left-color: var(--gold); } .mod.s-registered { border-left-color: var(--success); } .mod.s-rejected { border-left-color: var(--danger); } .mod.s-draft { border-left-color: #94a3b8; }
+    .mod-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .mod-top strong { font-size: 15px; }
+    .mod-fee { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--ink-soft); margin-top: 3px; }
+    .mod .action-group { margin-top: 12px; }
+    .mod .btn { padding: 8px 15px; font-size: 13px; }
+    .drawer-foot { padding: 16px 28px; border-top: 1px solid var(--line); background: #fff; }
+    .drawer-foot .btn { width: 100%; justify-content: center; }
+    .no-scroll { overflow: hidden; }
+    @media (prefers-reduced-motion: reduce) { .drawer, .drawer-backdrop { transition: none; } }
+</style>
+
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeStudent()"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerName" aria-hidden="true">
+    <div class="drawer-head">
+        <span class="eyebrow">Student profile</span>
+        <button type="button" class="drawer-close" id="drawerClose" onclick="closeStudent()" aria-label="Close"><i class="fas fa-xmark"></i></button>
+        <div class="avatar" id="drawerAvatar"></div>
+        <h2 id="drawerName"></h2>
+    </div>
+    <div class="drawer-body">
+        <ul class="info-list" id="drawerInfo"></ul>
+        <h3 class="sec">Registration list <span id="drawerCount"></span></h3>
+        <div id="drawerMods"></div>
+    </div>
+    <div class="drawer-foot"><a class="btn btn-outline" id="drawerFull" href="#"><i class="fas fa-up-right-from-square"></i> Open full page</a></div>
+</aside>
+
+<?php admin_reject_modal(); ?>
+
 <script>
+    var STUDENTS = <?php echo json_encode($drawer, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+    var lastFocus = null;
+
+    function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
+    function fmt(n) { return Number(n).toLocaleString('en-US'); }
+
+    function openStudent(id) {
+        var s = STUDENTS[id]; if (!s) return;
+        lastFocus = document.activeElement;
+        document.getElementById('drawerAvatar').textContent = (s.name || '?').charAt(0).toUpperCase();
+        document.getElementById('drawerName').textContent = s.name;
+        document.getElementById('drawerInfo').innerHTML =
+            '<li><i class="fas fa-envelope"></i><div><small>Email</small>' + esc(s.email) + '</div></li>' +
+            '<li><i class="fas fa-phone"></i><div><small>Phone</small>' + esc(s.phone) + '</div></li>' +
+            '<li><i class="fas fa-graduation-cap"></i><div><small>Program</small>' + esc(s.program) + '</div></li>';
+        document.getElementById('drawerCount').textContent = s.regs.length + (s.regs.length === 1 ? ' module' : ' modules');
+        var html = '';
+        s.regs.forEach(function (r) {
+            var st = r.status.toLowerCase(), base = 'approve.php?id=' + r.id + '&user_id=' + s.id + '&return=students';
+            var actions = '';
+            if (r.status === 'Pending') {
+                actions = '<div class="action-group">' +
+                    '<a class="btn btn-approve" href="' + base + '&action=approve"><i class="fas fa-check"></i> Approve</a>' +
+                    '<a class="btn btn-reject" href="' + base + '&action=reject" data-m="' + esc(r.module).replace(/"/g, '&quot;') + '" data-s="' + esc(s.name).replace(/"/g, '&quot;') + '" onclick="return confirmReject(this, this.dataset.m, this.dataset.s)"><i class="fas fa-xmark"></i> Reject</a></div>';
+            } else if (r.status === 'Draft') {
+                actions = '<div class="mod-fee" style="margin-top:10px"><i class="fas fa-clock"></i> Not submitted by student yet</div>';
+            }
+            html += '<div class="mod s-' + st + '"><div class="mod-top"><strong>' + esc(r.module) + '</strong><span class="badge badge-' + st + '">' + esc(r.status) + '</span></div>' +
+                    '<div class="mod-fee">' + fmt(r.fee) + ' Tsh</div>' + actions + '</div>';
+        });
+        document.getElementById('drawerMods').innerHTML = html || '<div class="empty-state" style="padding:24px 0"><p>No modules selected yet.</p></div>';
+        document.getElementById('drawerFull').href = 'admin_student_details.php?user_id=' + s.id;
+        document.getElementById('drawerBackdrop').classList.add('open');
+        var d = document.getElementById('drawer'); d.classList.add('open'); d.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('no-scroll');
+        document.getElementById('drawerClose').focus();
+    }
+
+    function closeStudent() {
+        document.getElementById('drawerBackdrop').classList.remove('open');
+        var d = document.getElementById('drawer'); d.classList.remove('open'); d.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('no-scroll');
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !document.getElementById('rejectConfirm').classList.contains('open')) closeStudent();
+    });
+
+    // Reopen after Approve/Reject so the admin stays in context
+    var openId = new URLSearchParams(location.search).get('open');
+    if (openId && STUDENTS[openId]) { openStudent(openId); history.replaceState(null, '', 'admin.php'); }
+
     var box = document.getElementById('studentSearch');
     if (box) box.addEventListener('input', function () {
         var q = this.value.toLowerCase();
